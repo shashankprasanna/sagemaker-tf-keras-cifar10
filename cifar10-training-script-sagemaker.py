@@ -87,12 +87,12 @@ def cifar10_model(input_shape):
     x = Flatten()(x)
     predictions = Dense(10, activation='softmax')(x)
     mdl = Model(inputs=base_model.input, outputs=predictions)
-    mdl.summary()
+    #mdl.summary()
     return mdl
 
 
 #%%
-def main():
+def main(args):
     # Hyper-parameters
     epochs = args.epochs
     lr = args.learning_rate
@@ -101,16 +101,16 @@ def main():
     weight_decay = args.weight_decay
     optimizer = args.optimizer
 
-    # Data directories and other options
+    # SageMaker options
     gpu_count = args.gpu_count
     model_dir = args.model_dir
     training_dir = args.training
     validation_dir = args.validation
     eval_dir = args.eval
 
-    train_dataset = make_batch(training_dir,  batch_size)
-    val_dataset = make_batch(validation_dir, batch_size)
-    eval_dataset = make_batch(eval_dir, batch_size)
+    train_dataset = make_batch(training_dir+'/train.tfrecords',  batch_size)
+    val_dataset = make_batch(validation_dir+'/validation.tfrecords', batch_size)
+    eval_dataset = make_batch(eval_dir+'/eval.tfrecords', batch_size)
 
     input_shape = (HEIGHT, WIDTH, DEPTH)
     model = cifar10_model(input_shape)
@@ -148,28 +148,26 @@ def main():
     # Save model to model directory
     tf.contrib.saved_model.save_keras_model(model, args.model_dir)
 
+    
 #%%
-if __name__ == "__main__":
+if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
 
     # Hyper-parameters
-    parser.add_argument('--epochs',        type=int,   default=10)
-    parser.add_argument('--learning-rate', type=float, default=0.01)
-    parser.add_argument('--batch-size',    type=int,   default=128)
+    parser.add_argument('--epochs',        type=int,   default=1)
+    parser.add_argument('--learning-rate', type=float, default=0.04)
+    parser.add_argument('--batch-size',    type=int,   default=1024)
     parser.add_argument('--weight-decay',  type=float, default=2e-4)
     parser.add_argument('--momentum',      type=float, default='0.9')
-    parser.add_argument('--optimizer',     type=str,   default='adam')
-    
-    # Data directories and other options
-    parser.add_argument('--gpu-count',     type=int,   default=0)
-    parser.add_argument('--model_dir',     type=str,   default='./models')
-    parser.add_argument('--training',      type=str,   default='./data/cifar10-tfrecords/train/train.tfrecords')
-    parser.add_argument('--validation',    type=str,   default='./data/cifar10-tfrecords/validation/validation.tfrecords')
-    parser.add_argument('--eval',          type=str,   default='./data/cifar10-tfrecords/eval/eval.tfrecords')
+    parser.add_argument('--optimizer',     type=str,   default='sgd')
+
+    # SageMaker parameters
+    parser.add_argument('--gpu-count',     type=int,   default=os.environ['SM_NUM_GPUS'])
+    parser.add_argument('--model_dir',     type=str,   default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--training',      type=str,   default=os.environ['SM_CHANNEL_TRAINING'])
+    parser.add_argument('--validation',    type=str,   default=os.environ['SM_CHANNEL_VALIDATION'])
+    parser.add_argument('--eval',          type=str,   default=os.environ['SM_CHANNEL_EVAL'])
     
     args = parser.parse_args()
     main(args)
-
-
-
