@@ -36,7 +36,7 @@ def make_batch(filenames, batch_size):
     dataset = tf.data.TFRecordDataset(filenames).repeat()
 
     # Parse records.
-    dataset = dataset.map(single_example_parser, num_parallel_calls=os.cpu_count())
+    dataset = dataset.map(single_example_parser, num_parallel_calls=1)
 
     # Batch it up.
     dataset = dataset.batch(batch_size, drop_remainder=True)
@@ -159,8 +159,8 @@ if __name__ == '__main__':
 
     # Hyper-parameters
     parser.add_argument('--epochs',        type=int,   default=1)
-    parser.add_argument('--learning-rate', type=float, default=0.04)
-    parser.add_argument('--batch-size',    type=int,   default=1024)
+    parser.add_argument('--learning-rate', type=float, default=0.01)
+    parser.add_argument('--batch-size',    type=int,   default=128)
     parser.add_argument('--weight-decay',  type=float, default=2e-4)
     parser.add_argument('--momentum',      type=float, default='0.9')
     parser.add_argument('--optimizer',     type=str,   default='sgd')
@@ -173,4 +173,6 @@ if __name__ == '__main__':
     parser.add_argument('--eval',             type=str,   default=os.environ['SM_CHANNEL_EVAL'])
     
     args = parser.parse_args()
+    print('---------------------')
+    print(args)
     main(args)
