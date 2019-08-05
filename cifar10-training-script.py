@@ -92,7 +92,7 @@ def cifar10_model(input_shape):
 
 
 #%%
-def main():
+def main(args):
     # Hyper-parameters
     epochs = args.epochs
     lr = args.learning_rate
@@ -118,7 +118,7 @@ def main():
     # Multi-GPU training
     if gpu_count > 1:
         model = multi_gpu_model(model, gpus=gpu_count)
-
+    
     # Optimizer
     if optimizer.lower() == 'sgd':
         opt = SGD(lr=lr, decay=weight_decay, momentum=momentum)
@@ -164,9 +164,9 @@ if __name__ == "__main__":
     # Data directories and other options
     parser.add_argument('--gpu-count',     type=int,   default=0)
     parser.add_argument('--model_dir',     type=str,   default='./models')
-    parser.add_argument('--training',      type=str,   default='./data/cifar10-tfrecords/train/train.tfrecords')
-    parser.add_argument('--validation',    type=str,   default='./data/cifar10-tfrecords/validation/validation.tfrecords')
-    parser.add_argument('--eval',          type=str,   default='./data/cifar10-tfrecords/eval/eval.tfrecords')
+    parser.add_argument('--training',      type=str,   default='../data/train/train.tfrecords')
+    parser.add_argument('--validation',    type=str,   default='../data/validation/validation.tfrecords')
+    parser.add_argument('--eval',          type=str,   default='../data/eval/eval.tfrecords')
     
     args = parser.parse_args()
     main(args)
