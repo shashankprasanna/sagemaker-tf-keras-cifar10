@@ -142,14 +142,14 @@ def main(args):
                            eval_dataset[1],
                            steps=10000 // args.batch_size,
                            verbose=0)
-    print('Validation loss    :', score[0])
-    print('Validation accuracy:', score[1])
+    print('Test loss    :', score[0])
+    print('Test accuracy:', score[1])
 
     print(args.model_dir)
     print(model)
     
     # Save model to model directory
-    tf.contrib.saved_model.save_keras_model(model, os.environ['SM_MODEL_DIR'])
+    tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
 
     
 #%%
@@ -166,7 +166,8 @@ if __name__ == '__main__':
     parser.add_argument('--optimizer',     type=str,   default='sgd')
 
     # SageMaker parameters
-    parser.add_argument('--model_dir',        type=str,   default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--model_dir',        type=str)
+    parser.add_argument('--model_output_dir', type=str,   default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--gpu-count',        type=int,   default=os.environ['SM_NUM_GPUS'])
     parser.add_argument('--training',         type=str,   default=os.environ['SM_CHANNEL_TRAINING'])
     parser.add_argument('--validation',       type=str,   default=os.environ['SM_CHANNEL_VALIDATION'])
