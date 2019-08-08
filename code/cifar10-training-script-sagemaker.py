@@ -13,6 +13,10 @@ WIDTH = 32
 DEPTH = 3
 NUM_CLASSES = 10
 
+# Copy inference pre/post-processing script so that it'll be included in the model package
+os.system('mkdir /opt/ml/model/code')
+os.system('cp inference.py /opt/ml/model/code')
+os.system('cp requirements.txt /opt/ml/model/code')
 
 #%%
 def train_preprocess_fn(image):
