@@ -36,7 +36,7 @@ def make_batch(filenames, batch_size):
     dataset = tf.data.TFRecordDataset(filenames).repeat()
 
     # Parse records.
-    dataset = dataset.map(single_example_parser, num_parallel_calls=os.cpu_count())
+    dataset = dataset.map(single_example_parser, num_parallel_calls=1)
 
     # Batch it up.
     dataset = dataset.batch(batch_size, drop_remainder=True)
@@ -87,7 +87,6 @@ def cifar10_model(input_shape):
     x = Flatten()(x)
     predictions = Dense(10, activation='softmax')(x)
     mdl = Model(inputs=base_model.input, outputs=predictions)
-    mdl.summary()
     return mdl
 
 
@@ -118,7 +117,7 @@ def main(args):
     # Multi-GPU training
     if gpu_count > 1:
         model = multi_gpu_model(model, gpus=gpu_count)
-    
+
     # Optimizer
     if optimizer.lower() == 'sgd':
         opt = SGD(lr=lr, decay=weight_decay, momentum=momentum)
@@ -142,11 +141,11 @@ def main(args):
                            eval_dataset[1],
                            steps=10000 // args.batch_size,
                            verbose=0)
-    print('Validation loss    :', score[0])
-    print('Validation accuracy:', score[1])
+    print('Test loss    :', score[0])
+    print('Test accuracy:', score[1])
 
     # Save model to model directory
-    tf.contrib.saved_model.save_keras_model(model, args.model_dir)
+    tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
 
 #%%
 if __name__ == "__main__":
@@ -159,11 +158,11 @@ if __name__ == "__main__":
     parser.add_argument('--batch-size',    type=int,   default=128)
     parser.add_argument('--weight-decay',  type=float, default=2e-4)
     parser.add_argument('--momentum',      type=float, default='0.9')
-    parser.add_argument('--optimizer',     type=str,   default='adam')
-    
+    parser.add_argument('--optimizer',     type=str,   default='sgd')
+
     # Data directories and other options
-    parser.add_argument('--gpu-count',     type=int,   default=0)
-    parser.add_argument('--model_dir',     type=str,   default='./models')
+    parser.add_argument('--gpu-count',        type=int,   default=0)
+    parser.add_argument('--model_output_dir', type=str,   default='./models')
     parser.add_argument('--training',      type=str,   default='../data/train/train.tfrecords')
     parser.add_argument('--validation',    type=str,   default='../data/validation/validation.tfrecords')
     parser.add_argument('--eval',          type=str,   default='../data/eval/eval.tfrecords')

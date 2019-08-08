@@ -87,7 +87,6 @@ def cifar10_model(input_shape):
     x = Flatten()(x)
     predictions = Dense(10, activation='softmax')(x)
     mdl = Model(inputs=base_model.input, outputs=predictions)
-    #mdl.summary()
     return mdl
 
 
@@ -145,20 +144,16 @@ def main(args):
     print('Test loss    :', score[0])
     print('Test accuracy:', score[1])
 
-    print(args.model_dir)
-    print(model)
-    
     # Save model to model directory
     tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
 
-    
 #%%
-if __name__ == '__main__':
+if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
 
     # Hyper-parameters
-    parser.add_argument('--epochs',        type=int,   default=1)
+    parser.add_argument('--epochs',        type=int,   default=10)
     parser.add_argument('--learning-rate', type=float, default=0.01)
     parser.add_argument('--batch-size',    type=int,   default=128)
     parser.add_argument('--weight-decay',  type=float, default=2e-4)
@@ -174,6 +169,4 @@ if __name__ == '__main__':
     parser.add_argument('--eval',             type=str,   default=os.environ['SM_CHANNEL_EVAL'])
     
     args = parser.parse_args()
-    print('---------------------')
-    print(args)
     main(args)
